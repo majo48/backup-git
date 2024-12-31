@@ -9,3 +9,4 @@ parameters: SERVERNAME, USERNAME, PASSWORD for NAS access.
 
 installed:  pip (24.3.1)
 installed:  .venv
+installed:  pysmb
