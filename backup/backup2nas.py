@@ -81,12 +81,13 @@ location = "/Volumes/myMacMini/"
 folder="#recycle"
 if os.path.exists(location+folder):
     print('Mount point: exists')
+    # backup important Mac-Mini folders and files
     errors = ''
-    errors += backup("/Users/mart/Desktop") # folder scripts and it's contents
+    errors += backup("/Users/mart/Desktop")   # folder scripts and it's contents
     errors += backup("/Users/mart/Documents") # folder scripts and it's contents
-    errors += backup("/Users/mart/Projects") # folder scripts and it's contents
-    errors += backup("/Users/mart/Scripts") # folder scripts and it's contents
-    errors += backup("/Users/mart/Dropbox") # folder scripts and it's contents
+    errors += backup("/Users/mart/Projects")  # folder scripts and it's contents
+    errors += backup("/Users/mart/Scripts")   # folder scripts and it's contents
+    errors += backup("/Users/mart/Dropbox")   # folder scripts and it's contents
     print(errors)
 else:
     print('Error: cannot find NAS share, is it mounted?')
