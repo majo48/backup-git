@@ -9,3 +9,4 @@ parameters: NASSERVERNAME, NASUSERNAME, NASPASSWORD for NAS access.
 
 installed:  pip (24.3.1)
 installed:  .venv
+installed:  psutil (6.1.1)

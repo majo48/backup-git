@@ -17,7 +17,34 @@ import sys
 from sys import platform
 import os
 import subprocess
-from subprocess import check_output
+import psutil
+
+def backup(source):
+    """
+    backup files and folders from current host to remote NAS share 'myMacMini'
+    using: rsync [options] Source Destination
+    options:
+        -rlpt       
+            -r = Recursive, traverse into subdirectories
+            -l = Treat symlinks as symlinks; don’t follow them
+            -p = Preserve permissions
+            -t = Preserve creation and modification dates and times
+        -- stats    Show file transfer statistics
+        --del       Delete files that don’t exist on the sending side
+    """
+    try:
+        destination = "/Volumes/myMacMini"
+        sp = subprocess.run( 
+            ["rsync", "-rlpt", "--stats", "--del", source, destination], 
+            capture_output=True, text=True
+        )
+        print("RSYNC statistics:")
+        print(sp.stdout)
+        print(sp.stderr)
+        #
+    except subprocess.CalledProcessError as err:
+        print(err.output)
+    pass
 
 # ====
 # current user
@@ -29,6 +56,9 @@ if platform != "darwin":
     print("*** Error: script not compatible with the current operating system")
     sys.exit(1)  
 print("Operating System: mac OS")
+# process name
+p = psutil.Process(os.getpid())
+print("Process name: "+p.name())
 
 # ====
 # check that Finder app is running
@@ -41,12 +71,14 @@ print("Finder app: active")
 
 # ====
 # check that NAS is mounted
-location = "/Volumes/myMacMini"
-file="_readme.txt"
-if os.path.isfile(location+"/"+file):
+location = "/Volumes/myMacMini/"
+folder="#recycle"
+if os.path.exists(location+folder):
     print('Mount point: exists')
+    backup("/Users/mart/Scripts") # folder scripts and it's contents
 else:
-    print('Error: cannot find /Volumes/myMacMini/_readme.txt')
+    print('Error: cannot find NAS share, is it mounted?')
+pass
 
 # ====
 # Close script
