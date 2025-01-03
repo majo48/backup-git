@@ -11,6 +11,7 @@ Prerequisites:
     4. Open System-Setting > Login Items & Extensions > Open at Login > drag myMacMini icon to list
     5. Restart computer
     6. Location /Volumes/myMacMini is permanent
+    7. Visual Studio Code application needs System-Settings > Full Disk Access for things to work
 """
 
 import sys
