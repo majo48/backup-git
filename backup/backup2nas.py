@@ -30,21 +30,26 @@ def backup(source):
             -l = Treat symlinks as symlinks; don’t follow them
             -p = Preserve permissions
             -t = Preserve creation and modification dates and times
+        -- exclude '.*'
+        -- include '.gitignore'
         -- stats    Show file transfer statistics
         --del       Delete files that don’t exist on the sending side
     """
     try:
+        print("Backup folder: "+source)
         destination = "/Volumes/myMacMini"
         sp = subprocess.run( 
-            ["rsync", "-rlpt", "--stats", "--del", source, destination], 
+            ["rsync", "-rlpt", "--stats", "--del", 
+             "--exclude", "'.*'", "--include", "'.gitignore'", 
+             source, destination], 
             capture_output=True, text=True
         )
-        print("RSYNC statistics:")
+        print("RSYNC statistics for: "+source)
         print(sp.stdout)
-        print(sp.stderr)
+        return (sp.stderr)
         #
     except subprocess.CalledProcessError as err:
-        print(err.output)
+        return err.output
     pass
 
 # ====
@@ -76,7 +81,13 @@ location = "/Volumes/myMacMini/"
 folder="#recycle"
 if os.path.exists(location+folder):
     print('Mount point: exists')
-    backup("/Users/mart/Scripts") # folder scripts and it's contents
+    errors = ''
+    errors += backup("/Users/mart/Desktop") # folder scripts and it's contents
+    errors += backup("/Users/mart/Documents") # folder scripts and it's contents
+    errors += backup("/Users/mart/Projects") # folder scripts and it's contents
+    errors += backup("/Users/mart/Scripts") # folder scripts and it's contents
+    errors += backup("/Users/mart/Dropbox") # folder scripts and it's contents
+    print(errors)
 else:
     print('Error: cannot find NAS share, is it mounted?')
 pass
