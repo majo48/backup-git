@@ -12,6 +12,7 @@ Prerequisites:
     5. Restart computer
     6. Location /Volumes/myMacMini is permanent
     7. Visual Studio Code application needs System-Settings > Full Disk Access for things to work
+    8. update rsync from version 2.6.9 (buggy) to version 3.3.0
 """
 
 import sys
