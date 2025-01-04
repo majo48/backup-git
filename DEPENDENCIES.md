@@ -2,13 +2,13 @@
 
 # Development environment
 
-operating system:  mac Sequoia (15.2)
-hardware platform: mac mini M4pro
-preinstalled:      python3 (3.9.3), includes python-decouple (3.8)
-preinstalled:      pgrep
-installed:         Visual Studio Code (1.96.2)
-installed:         homebrew (4.4.14)
-upgraded:          rsync (3.3.0)
+- operating system:  mac Sequoia (15.2)
+- hardware platform: mac mini M4pro
+- preinstalled:      python3 (3.9.3), includes python-decouple (3.8)
+- preinstalled:      pgrep
+- installed:         Visual Studio Code (1.96.2)
+- installed:         homebrew (4.4.14)
+- upgraded:          rsync (3.3.0)
 
 # Setup auto-connect for NAS
 
@@ -30,6 +30,6 @@ Mac OS version Sequoia has new Privacy & Security Settings:
 
 # Python packages
 
-installed:  pip (24.3.1)
-installed:  .venv
-installed:  psutil (6.1.1)
+- installed:  pip (24.3.1)
+- installed:  .venv
+- installed:  psutil (6.1.1)
