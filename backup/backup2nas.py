@@ -1,18 +1,7 @@
 #!/bin/sh
 """
 Backup a list of folders to a NAS, using macOS CLI modules and Python.
-Connecting to the NAS using the terminal or scripts is not without problems.
-
-Prerequisites:
-=============
-    1. Use Finder Go > Connect to server > servername > connect > username + password 
-    2. Select folder myMacMini
-    3. Open Finder-Settings > General > set Connected servers > creates myMacMini icon
-    4. Open System-Setting > Login Items & Extensions > Open at Login > drag myMacMini icon to list
-    5. Restart computer
-    6. Location /Volumes/myMacMini is permanent
-    7. Visual Studio Code application needs System-Settings > Full Disk Access for things to work
-    8. update rsync from version 2.6.9 (buggy) to version 3.3.0
+See DEPENDENCIES.md, backingup to NAS is not without it's problems.
 """
 
 import sys
@@ -47,7 +36,7 @@ def backup(source):
         )
         print("RSYNC statistics for: "+source)
         print(sp.stdout)
-        return (sp.stderr)
+        return sp.stderr
         #
     except subprocess.CalledProcessError as err:
         return err.output
