@@ -30,6 +30,8 @@ Mac OS version Sequoia has new Privacy & Security Settings:
 
 # Python packages
 
+The following Python packages are needed for this application:
+
 - installed:  pip (24.3.1)
 - installed:  .venv
 - installed:  psutil (6.1.1)

@@ -9,8 +9,9 @@ from sys import platform
 import os
 import subprocess
 import psutil
+from decouple import config
 
-def backup(source):
+def backup(source, destination):
     """
     backup files and folders from current host to remote NAS share 'myMacMini'
     using: rsync [options] Source Destination
@@ -27,7 +28,6 @@ def backup(source):
     """
     try:
         print("Backup folder: "+source)
-        destination = "/Volumes/myMacMini"
         sp = subprocess.run( 
             ["rsync", "-rlpt", "--stats", "--del", 
              "--exclude", "'.*'", "--include", "'.gitignore'", 
@@ -67,17 +67,18 @@ print("Finder app: active")
 
 # ====
 # check that NAS is mounted
-location = "/Volumes/myMacMini/"
+location = config("NASMOUNTPOINT") # pattern: /Volumes/<sharename>
 folder="#recycle"
-if os.path.exists(location+folder):
+if os.path.exists(location+"/"+folder):
     print('Mount point: exists')
     # backup important Mac-Mini folders and files
     errors = ''
-    errors += backup("/Users/mart/Desktop")   # folder scripts and it's contents
-    errors += backup("/Users/mart/Documents") # folder scripts and it's contents
-    errors += backup("/Users/mart/Projects")  # folder scripts and it's contents
-    errors += backup("/Users/mart/Scripts")   # folder scripts and it's contents
-    errors += backup("/Users/mart/Dropbox")   # folder scripts and it's contents
+    user=config("MACUSERNAME") # pattern: valid Mac OS username
+    errors += backup("/Users/"+user+"/Desktop", location)   # folder scripts and it's contents
+    errors += backup("/Users/"+user+"/Documents", location) # folder scripts and it's contents
+    errors += backup("/Users/"+user+"/Projects", location)  # folder scripts and it's contents
+    errors += backup("/Users/"+user+"/Scripts", location)   # folder scripts and it's contents
+    errors += backup("/Users/"+user+"/Dropbox", location)   # folder scripts and it's contents
     print(errors)
 else:
     print('Error: cannot find NAS share, is it mounted?')
