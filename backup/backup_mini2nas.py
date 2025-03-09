@@ -1,7 +1,7 @@
 #!/bin/sh
 """
 Backup a list of folders to a NAS, using macOS CLI modules and Python.
-See DEPENDENCIES.md, backingup to NAS is not without it's problems.
+See DEPENDENCIES.md, backing up to NAS is not without its problems.
 """
 
 import sys
@@ -10,37 +10,9 @@ import os
 import subprocess
 import psutil
 from decouple import config
+from backup_module import backup
 
-def backup(source, destination):
-    """
-    backup files and folders from current host to remote NAS share 'myMacMini'
-    using: rsync [options] Source Destination
-    options:
-        -rlpt       
-            -r = Recursive, traverse into subdirectories
-            -l = Treat symlinks as symlinks; don’t follow them
-            -p = Preserve permissions
-            -t = Preserve creation and modification dates and times
-        -- exclude '.*'
-        -- include '.gitignore'
-        -- stats    Show file transfer statistics
-        --del       Delete files that don’t exist on the sending side
-    """
-    try:
-        print("Backup folder: "+source)
-        sp = subprocess.run( 
-            ["rsync", "-rlpt", "--stats", "--del", 
-             "--exclude", "'.*'", "--include", "'.gitignore'", 
-             source, destination], 
-            capture_output=True, text=True
-        )
-        print("RSYNC statistics for: "+source)
-        print(sp.stdout)
-        return sp.stderr
-        #
-    except subprocess.CalledProcessError as err:
-        return err.output
-    pass
+# main ========
 
 # ====
 # current user
@@ -67,13 +39,13 @@ print("Finder app: active")
 
 # ====
 # check that NAS is mounted
-location = config("NASMOUNTPOINT") # pattern: /Volumes/<sharename>
+location = config("NAS_MOUNT_POINT") # pattern: /Volumes/<share name>
 folder="#recycle"
 if os.path.exists(location+"/"+folder):
     print('Mount point: exists')
     # backup important Mac-Mini folders and files
     errors = ''
-    user=config("MACUSERNAME") # pattern: valid Mac OS username
+    user=config("MAC_USERNAME") # pattern: valid Mac OS username
     errors += backup("/Users/"+user+"/Desktop", location)   # folder scripts and it's contents
     errors += backup("/Users/"+user+"/Documents", location) # folder scripts and it's contents
     errors += backup("/Users/"+user+"/Projects", location)  # folder scripts and it's contents
