@@ -5,55 +5,52 @@ See DEPENDENCIES.md, backing up to NAS is not without its problems.
 """
 
 import sys
-from sys import platform
 import os
-import subprocess
 import psutil
 from decouple import config
-from backup_module import backup
+from backup_module import backup_with_progress, is_macos, finder_active
 
 # main ========
-
+folders = ["Desktop", "Documents", "Projects", "Scripts", "Dropbox"]
 # ====
 # current user
 print("Username: "+os.getlogin())
-
 # ====
 # check that script is running in macOS
-if platform != "darwin":
-    print("*** Error: script not compatible with the current operating system")
-    sys.exit(1)  
-print("Operating System: mac OS")
+if not is_macos():
+    sys.exit(1)
+# ====
 # process name
 p = psutil.Process(os.getpid())
 print("Process name: "+p.name())
-
 # ====
 # check that Finder app is running
-sp = subprocess.run( ["pgrep", "Finder"], capture_output=True, text=True )
-pid = sp.stdout
-if pid == '':
-    print("*** Error: the Finder application must be active/running.")
+if not finder_active():
     sys.exit(2)
-print("Finder app: active")
-
 # ====
 # check that NAS is mounted
-location = config("NAS_MOUNT_POINT") # pattern: /Volumes/<share name>
-folder="#recycle"
-if os.path.exists(location+"/"+folder):
+destination = config("NAS_MOUNT_POINT") # pattern: /Volumes/<share name>
+if os.path.exists(destination):
     print('Mount point: exists')
-    # backup important Mac-Mini folders and files
-    errors = ''
-    user=config("MAC_USERNAME") # pattern: valid Mac OS username
-    errors += backup("/Users/"+user+"/Desktop", location)   # folder scripts and it's contents
-    errors += backup("/Users/"+user+"/Documents", location) # folder scripts and it's contents
-    errors += backup("/Users/"+user+"/Projects", location)  # folder scripts and it's contents
-    errors += backup("/Users/"+user+"/Scripts", location)   # folder scripts and it's contents
-    errors += backup("/Users/"+user+"/Dropbox", location)   # folder scripts and it's contents
-    print(errors)
+    # backup important folders and files
+    errors = []
+    user = config("MAC_USERNAME")
+    for folder in folders:
+        source = "/Users/" + user +"/" + folder # without trailing slash
+        error = backup_with_progress(source, destination)
+        errors.append(error)
+    pass
+    for error in errors:
+        if error:
+            lines = error.split('\n')
+            for line in lines:
+                print(line)
+            pass
+        pass
+    pass
 else:
     print('Error: cannot find NAS share, is it mounted?')
+    sys.exit(3)
 pass
 
 # ====

@@ -10,14 +10,13 @@ Notes:
 
 import sys
 import os
-from backup_module import backup, is_macos, finder_active
 import psutil
 from decouple import config
+from backup_module import backup_with_progress, is_macos, finder_active
 
 # main ========
-folders = ["/volumes/myMacMini/", "/volumes/myArchive/"] # fully qualified mount point, ending with slash!
-# folders = ["/volumes/myMacMini/", "/volumes/myArchive/", "/volumes/myMacBook/", "/volumes/myENVY/", "/volumes/myBigMac/", "/volumes/myTravelmate/"]
-
+folders = ["/volumes/myMacMini", "/volumes/myArchive"] # fully qualified mount point, no ending slash
+# folders = ["/volumes/myMacMini", "/volumes/myArchive", "/volumes/myMacBook", "/volumes/myENVY", "/volumes/myBigMac", "/volumes/myTravelmate"]
 # ====
 # current user
 print("Username: "+os.getlogin())
@@ -40,21 +39,22 @@ if os.path.exists(source_location):
     destination_location = config("PORTABLE_MOUNT_POINT")
     if os.path.exists(destination_location):
         print("Destination mount point: exists.")
-        # backup important Mac-Mini folders and files
+        # backup important folders and files
         errors = []
         for folder in folders:
-            subfolder = folder.split('/')
-            error = backup(folder, destination_location+"/"+subfolder[2])
+            error = backup_with_progress(folder, destination_location)
             errors.append(error)
         pass
         for error in errors:
-            lines = error.split('\n')
-            for line in lines:
-                print(line)
+            if error:
+                lines = error.split('\n')
+                for line in lines:
+                    print(line)
+                pass
             pass
         pass
     else:
-        print('Error: cannot find WD_Elements share, is it mounted?')
+        print('Error: cannot find portable share, is it mounted?')
         sys.exit(3)
 else:
     print('Error: cannot find NAS share, is it mounted?')
