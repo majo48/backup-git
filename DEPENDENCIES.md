@@ -16,10 +16,11 @@ Setup Mac OS to auto-connect to NAS, mounting through CLI commands seems to be i
 
 1. Use Finder Go > Connect to server > servername > connect > username + password 
 2. Select folder myMacMini
-3. Open Finder-Settings > General > set Connected servers > creates myMacMini icon
-4. Open System-Setting > Login Items & Extensions > Open at Login > drag myMacMini icon to list
-5. Restart computer
-6. Location /Volumes/myMacMini is permanent
+3. Open Finder-Settings > General > set Connected servers > creates myMacMini share
+4. Restart computer
+5. Share /Volumes/myMacMini is permanent
+   - If you turn the NAS OFF, it is not displayed in Finder
+   - If you turn the NAS ON, it is displayed again as a network device in Finder
 
 # System Settings
 
