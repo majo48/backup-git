@@ -11,7 +11,7 @@ from decouple import config
 from backup_module import backup_with_progress, is_macos, finder_active
 
 # main ========
-folders = ["Desktop", "Documents", "Projects", "Scripts", "Dropbox"]
+folders = ["Desktop", "Documents", "Projects", "Scripts"]
 # ====
 # current user
 print("Username: "+os.getlogin())
