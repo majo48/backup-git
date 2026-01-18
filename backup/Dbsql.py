@@ -54,10 +54,10 @@ class Dbsql:
         """
         Select record from database table metadata
         """
+        sql = "SELECT id, filePath, fileName, fileSize, fileModified, fileHash FROM metadata WHERE id = ?;"
         try:
-            sql = "SELECT id, filePath, fileName, fileSize, fileModified, fileHash FROM metadata WHERE id = ?;"
             cursor = self.conn.cursor()
-            cursor.execute(sql, row_id)
+            cursor.execute(sql, (row_id,))
             return cursor.fetchall() # success
         except sqlite3.Error as e:
             print("SQLite SELECT TABLE metadata error occurred:" + e.args[0])
@@ -67,8 +67,8 @@ class Dbsql:
         """
         Insert record into database table metadata
         """
+        sql = "INSERT INTO metadata(filePath, fileName, fileSize, fileModified, fileHash) VALUES (?, ?, ?, ?, ?);"
         try:
-            sql = "INSERT INTO metadata(filePath, fileName, fileSize, fileModified, fileHash) VALUES (?, ?, ?, ?, ?);"
             cursor = self.conn.cursor()
             cursor.execute(sql, (file_path, file_name, file_size, file_modified, file_hash))
             self.conn.commit()
@@ -81,14 +81,40 @@ class Dbsql:
         """
         Delete all records in table metadata
         """
+        sql = "DELETE FROM metadata;"
         try:
-            sql = "DELETE FROM metadata;"
             cursor = self.conn.cursor()
             cursor.execute(sql)
             return cursor.rowcount # success
         except sqlite3.Error as e:
             print("SQLite DELETE TABLE metadata error occurred:" + e.args[0])
         return None
+
+    def get_duplicate_filenames(self):
+        """
+        Get all duplicate filenames in database table metadata
+        """
+        sql = "SELECT fileName, COUNT(*) c FROM metadata GROUP BY fileName HAVING c > 1;"
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute(sql)
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            print("SQLite SELECT duplicate_filenames error occurred:" + e.args[0])
+        return []
+
+    def get_duplicate_rows(self, file_name):
+        """
+        Get duplicate rows from database table metadata with same 'filename'
+        """
+        sql = "SELECT * FROM metadata WHERE fileName=? ORDER BY fileModified ASC;"
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (file_name,))
+            return cursor.fetchall()
+        except sqlite3.Error as e:
+            print("SQLite SELECT duplicate_rows error occurred:" + e.args[0])
+        return []
 
 # main ========
 
