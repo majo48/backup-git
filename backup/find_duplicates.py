@@ -41,8 +41,8 @@ def list_files_walk(start_path='.'):
                 # hsh = compute_file_hash(fqn)
                 hsh = HASH_DUMMY
                 print(cnt, " ", fqn, " ", file, " ", siz, " ", mdt, " ", hsh)
-                id = db_metadata.set_row(fqn, file, siz, mdt, hsh)
-                if id is None:
+                idx = db_metadata.set_row(fqn, file, siz, mdt, hsh)
+                if idx is None:
                     return False # failed
                 cnt += 1
             pass
@@ -50,8 +50,7 @@ def list_files_walk(start_path='.'):
     return True # success
 
 def check_recursive(top_folder):
-    messages = []
-    messages.append('Check point top folder: '+top_folder)
+    messages = ['Check point top folder: '+top_folder]
     list_files_walk(top_folder)
     return messages
 
@@ -61,7 +60,7 @@ def run_code():
     # ====
     # check that script is running in macOS
     if not is_macos():
-        return 1 # error
+        return 1 # exit code
     # ====
     # process name
     p = psutil.Process(os.getpid())
@@ -69,7 +68,7 @@ def run_code():
     # ====
     # check that Finder app is running
     if not finder_active():
-        return 2 # error
+        return 2 # exit code
     # ====
     # check that NAS is mounted
     check_point = config("NAS_CHECK_POINT") # pattern: /Volumes/<share name>
@@ -82,9 +81,9 @@ def run_code():
         pass
     else:
         print('Error: cannot find NAS share, is it mounted in Finder?')
-        return 3 # error
-    return 0 # success
+        return 3 # exit code
+    return 0 # exit code, success
 
 # main ========
-rtrn = run_code()
-sys.exit(rtrn) # finished
+exit_code = run_code()
+sys.exit(exit_code) # finished

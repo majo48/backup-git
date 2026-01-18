@@ -3,7 +3,6 @@ SQLite with archived file metadata
 """
 
 import sqlite3
-from sqlite3.dbapi2 import Connection, Cursor
 
 class Dbsql:
 
@@ -31,7 +30,7 @@ class Dbsql:
             """)
             self.conn.commit()
         except sqlite3.Error as e:
-            print("Error: in SQL CREATE TABLE")
+            print("Error: in SQL CREATE TABLE" + e.args[0])
         pass
 
     # context manager ========
@@ -58,7 +57,7 @@ class Dbsql:
         try:
             sql = "SELECT id, filePath, fileName, fileSize, fileModified, fileHash FROM metadata WHERE id = ?;"
             cursor = self.conn.cursor()
-            cursor.execute(sql, (row_id))
+            cursor.execute(sql, row_id)
             return cursor.fetchall() # success
         except sqlite3.Error as e:
             print("SQLite SELECT TABLE metadata error occurred:" + e.args[0])
