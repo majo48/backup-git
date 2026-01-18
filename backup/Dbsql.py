@@ -1,0 +1,97 @@
+"""
+SQLite with archived file metadata
+"""
+
+import sqlite3
+from sqlite3.dbapi2 import Connection, Cursor
+
+class Dbsql:
+
+    def __init__(self, dbpath):
+        """
+        Initialize sql database
+        """
+        self.dbpath = dbpath
+        self.conn = sqlite3.connect(
+            dbpath,
+            detect_types=sqlite3.PARSE_DECLTYPES |
+            sqlite3.PARSE_COLNAMES)
+        cursor = self.conn.cursor()
+        try:
+            # Create table
+            cursor.executescript("""
+                CREATE TABLE IF NOT EXISTS metadata(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    filePath TEXT NOT NULL,
+                    fileName TEXT NOT NULL,
+                    fileSize INTEGER NOT NULL,
+                    fileModified TIMESTAMP NOT NULL, 
+                    fileHash
+                ); 
+            """)
+            self.conn.commit()
+        except sqlite3.Error as e:
+            print("Error: in SQL CREATE TABLE")
+        pass
+
+    # context manager ========
+
+    def __enter__(self):
+        """
+        context manager: begin session
+        """
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """
+        context manager: end of session
+        """
+        # close connection
+        self.conn.close()
+
+    # common functions ========
+
+    def get_row(self, row_id):
+        """
+        Select record from database table metadata
+        """
+        try:
+            sql = "SELECT id, filePath, fileName, fileSize, fileModified, fileHash FROM metadata WHERE id = ?;"
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (row_id))
+            return cursor.fetchall() # success
+        except sqlite3.Error as e:
+            print("SQLite SELECT TABLE metadata error occurred:" + e.args[0])
+        return [] # failed
+
+    def set_row(self, file_path, file_name, file_size, file_modified, file_hash=None):
+        """
+        Insert record into database table metadata
+        """
+        try:
+            sql = "INSERT INTO metadata(filePath, fileName, fileSize, fileModified, fileHash) VALUES (?, ?, ?, ?, ?);"
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (file_path, file_name, file_size, file_modified, file_hash))
+            self.conn.commit()
+            return cursor.lastrowid # success
+        except sqlite3.Error as e:
+            print("SQLite INSERT TABLE metadata error occurred:" + e.args[0])
+        return None # failed
+
+    def del_rows(self):
+        """
+        Delete all records in table metadata
+        """
+        try:
+            sql = "DELETE FROM metadata;"
+            cursor = self.conn.cursor()
+            cursor.execute(sql)
+            return cursor.rowcount # success
+        except sqlite3.Error as e:
+            print("SQLite DELETE TABLE metadata error occurred:" + e.args[0])
+        return None
+
+# main ========
+
+if __name__ == '__main__':
+    print("The SQL class module shall not be invoked on it's own.")

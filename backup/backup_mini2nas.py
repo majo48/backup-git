@@ -49,7 +49,7 @@ if os.path.exists(destination):
         pass
     pass
 else:
-    print('Error: cannot find NAS share, is it mounted?')
+    print('Error: cannot find NAS share, is it mounted in Finder?')
     sys.exit(3)
 pass
 

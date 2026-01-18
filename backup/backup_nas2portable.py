@@ -54,10 +54,10 @@ if os.path.exists(source_location):
             pass
         pass
     else:
-        print('Error: cannot find portable share, is it mounted?')
+        print('Error: cannot find portable share, is it mounted in Finder?')
         sys.exit(3)
 else:
-    print('Error: cannot find NAS share, is it mounted?')
+    print('Error: cannot find NAS share, is it mounted in Finder?')
     sys.exit(4)
 pass
 
