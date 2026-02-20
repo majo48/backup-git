@@ -25,7 +25,8 @@ class Dbsql:
                     fileName TEXT NOT NULL,
                     fileSize INTEGER NOT NULL,
                     fileModified TIMESTAMP NOT NULL, 
-                    fileHash
+                    fileHash,
+                    occurrence
                 ); 
             """)
             self.conn.commit()
@@ -54,7 +55,7 @@ class Dbsql:
         """
         Select record from database table metadata
         """
-        sql = "SELECT id, filePath, fileName, fileSize, fileModified, fileHash FROM metadata WHERE id = ?;"
+        sql = "SELECT id, filePath, fileName, fileSize, fileModified, fileHash, occurrence FROM metadata WHERE id = ?;"
         try:
             cursor = self.conn.cursor()
             cursor.execute(sql, (row_id,))
@@ -63,19 +64,33 @@ class Dbsql:
             print("SQLite SELECT TABLE metadata error occurred:" + e.args[0])
         return [] # failed
 
-    def set_row(self, file_path, file_name, file_size, file_modified, file_hash=None):
+    def set_row(self, file_path, file_name, file_size, file_modified, file_hash=None, occurrence=None):
         """
         Insert record into database table metadata
         """
-        sql = "INSERT INTO metadata(filePath, fileName, fileSize, fileModified, fileHash) VALUES (?, ?, ?, ?, ?);"
+        sql = "INSERT INTO metadata(filePath, fileName, fileSize, fileModified, fileHash, occurrence) VALUES (?, ?, ?, ?, ?, ?);"
         try:
             cursor = self.conn.cursor()
-            cursor.execute(sql, (file_path, file_name, file_size, file_modified, file_hash))
+            cursor.execute(sql, (file_path, file_name, file_size, file_modified, file_hash, occurrence))
             self.conn.commit()
             return cursor.lastrowid # success
         except sqlite3.Error as e:
             print("SQLite INSERT TABLE metadata error occurred:" + e.args[0])
         return None # failed
+
+    def update_hash_plus(self, id, hash, occurrence):
+        """
+        Update the hash in row with id=id
+        """
+        sql = "UPDATE metadata SET fileHash=?, occurrence=? WHERE id=?;"
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute(sql, (hash, occurrence, id))
+            self.conn.commit()
+            return cursor.rowcount
+        except sqlite3.Error as e:
+            print("SQLite UPDATE TABLE metadata error occurred:" + e.args[0])
+            raise Exception("Fatal SQLite error occurred")
 
     def del_rows(self):
         """

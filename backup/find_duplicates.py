@@ -70,6 +70,7 @@ def check_recursive(top_folder):
             file_name = name[0]
             rows = db_metadata.get_duplicate_rows(file_name)
             original_size = None
+            row_count = 0
             for row in rows:
                 file_id = row[0]
                 file_path = row[1]
@@ -78,6 +79,8 @@ def check_recursive(top_folder):
                     # the first candidate is the oldest file version
                     original_size = file_size
                     original_hash = compute_file_hash(file_path, algorithm='md5')
+                    db_metadata.update_hash_plus(file_id, original_hash, row_count)
+                    row_count += 1
                     pass
                 else:
                     # duplicate candidates
@@ -86,6 +89,8 @@ def check_recursive(top_folder):
                         duplicate_hash = compute_file_hash(file_path, algorithm='md5')
                         if duplicate_hash == original_hash:
                             # both files have the same content
+                            db_metadata.update_hash_plus(file_id, duplicate_hash, row_count)
+                            row_count += 1
                             totals += file_size
                             print("Duplicate file ["+str(file_id)+"]: "+file_path+", size: "+str(file_size))
                         pass # not a duplicate hash
@@ -117,10 +122,12 @@ def run_code():
     # check that NAS is mounted
     check_point = config("NAS_CHECK_POINT") # pattern: /Volumes/<share name>
     if os.path.exists(check_point):
-        print('Check point: exists')
+        dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print('Check point: exists', dt)
         # check folders (recursive) for duplicate files
         totals = check_recursive(check_point)
-        print('Total bytes in duplicate files: '+str(totals))
+        dt2 = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print('Total bytes in duplicate files: ', str(totals), dt2)
     else:
         print('Error: cannot find NAS share, is it mounted in Finder?')
         return 3 # exit code
