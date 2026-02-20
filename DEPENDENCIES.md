@@ -39,10 +39,12 @@ PORTABLE_MOUNT_POINT=/volumes/drive_name1
 
 PORTABLE_MOUNT_POINTS=["/volumes/drive_name1", "/volumes/drive_name2"]
 
+NAS_CHECK_POINT=/volumes/pictures_folder_on_NAS
+
+DB_FILENAME=/Users/folder_for_database/duplicates.db
+
 # Python packages
 
-The following Python packages are needed for this application:
-
-- installed:  pip (24.3.1)
-- installed:  .venv
-- installed:  psutil (6.1.1)
+Please see file 'requirements.txt' 
+and https://www.jetbrains.com/help/pycharm/managing-dependencies.html 
+in the PyCharm documentation.
