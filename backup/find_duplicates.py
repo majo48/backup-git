@@ -65,7 +65,7 @@ def check_recursive(top_folder):
     list_files_walk(top_folder)
     with Dbsql(config("DB_FILENAME")) as db_metadata:
         totals = 0 # total bytes in duplicate files
-        names = db_metadata.get_duplicate_filenames()
+        names = db_metadata.get_duplicate_files()
         for name in names:
             file_name = name[0]
             rows = db_metadata.get_duplicate_rows(file_name)

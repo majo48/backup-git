@@ -105,11 +105,11 @@ class Dbsql:
             print("SQLite DELETE TABLE metadata error occurred:" + e.args[0])
         return None
 
-    def get_duplicate_filenames(self):
+    def get_duplicate_files(self):
         """
         Get all duplicate filenames in database table metadata
         """
-        sql = "SELECT fileName, COUNT(*) c FROM metadata GROUP BY fileName HAVING c > 1;"
+        sql = "SELECT fileName, fileSize, COUNT(*) c FROM metadata GROUP BY fileName, fileSize HAVING c > 1;"
         try:
             cursor = self.conn.cursor()
             cursor.execute(sql)
