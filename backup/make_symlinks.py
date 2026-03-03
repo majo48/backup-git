@@ -5,10 +5,18 @@ Search for (find) duplicates in folder(s) in a NAS, using macOS CLI modules and 
 
 import sys
 import os
+import pathlib
 import psutil
 from decouple import config
 from backup_module import is_macos, finder_active
 from Dbsql import Dbsql
+
+def is_symlink(file_path):
+    """
+    Check if a file is a symlink
+    """
+    path = pathlib.Path(file_path)
+    return path.is_symlink()
 
 def make_symlink(file_path, duplicate_path):
     """
@@ -69,7 +77,10 @@ def run_code():
                         file_path = row[1]
                     else: # occurrence >0
                         duplicate_path = row[1]
-                        make_symlink(file_path, duplicate_path)
+                        if not (is_symlink(file_path) or is_symlink(duplicate_path)):
+                            make_symlink(file_path, duplicate_path)
+                        pass
+                    pass
                 pass
             pass
         return 0 # exit code
