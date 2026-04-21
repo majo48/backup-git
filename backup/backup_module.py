@@ -4,14 +4,19 @@ Backup with RSYNC methode.
 
 import subprocess
 import sys
+import os
 from sys import platform
 import re
 import time
 from decouple import config
 
-EXCLUDE = ("--exclude '/Virtual*' --exclude '*.iso' --exclude '*.vmem' "
-           "--exclude '*.vmdk' --exclude '*.vhd' --exclude '*.vhdx' "
-           "--exclude '*.vdi' --exclude '.DS_Store'")
+
+def _get_exclude():
+    """
+    get the --exclude-from=fully-qualified-filename
+    """
+    filename = os.getcwd()+"/exclude-file.txt"
+    return "--exclude-from="+filename
 
 def _is_safe(source, destination):
     """
@@ -26,46 +31,13 @@ def _is_safe(source, destination):
     else:
         return False # illegal/unsafe
 
-def backup(source, destination):
-    """
-    backup files and folders from current host to remote NAS share 'myMacMini'
-    using: rsync [options] Source Destination
-    options:
-        -rlpt
-            -r = Recursive, traverse into subdirectories
-            -l = Treat symlinks as symlinks; don’t follow them
-            -p = Preserve permissions
-            -t = Preserve creation and modification dates and times
-        --exclude '.*'
-        --include '.gitignore'
-        --stats   Show file transfer statistics
-        --delete  Delete files that don’t exist on the sending side
-    """
-    if not _is_safe(source, destination):
-        raise AssertionError("Illegal backup direction: from " + source + " to " + destination)
-    try:
-        print("Backup folder: "+source)
-        sp = subprocess.run(
-            ["rsync", "-rlpt", "--stats", "--del",
-             "--exclude", "'.*'", "--include", "'.gitignore'",
-             source, destination],
-            capture_output=True, text=True
-        )
-        print("RSYNC statistics for: "+source)
-        print(sp.stdout)
-        return sp.stderr
-        #
-    except subprocess.CalledProcessError as err:
-        return err.output
-    pass
-
 def _clean(line):
     """
-        Remove all commas from line (output by rsync version 3.4.1),
-        these commas lead to wrong numbers greater than 999.
-            line: bytearray   (with commas)
-            return: bytearray (without commas)
-        """
+    Remove all commas from line (output by rsync version 3.4.1),
+    these commas lead to wrong numbers greater than 999.
+        line: bytearray   (with commas)
+        return: bytearray (without commas)
+    """
     cln = bytearray()
     for bite in line:
         if bite != 44:  # comma
@@ -82,7 +54,7 @@ def _get_backup_size(source, destination):
     """
     print('Dry run: calculate number of files')
     cmd = ('rsync -aW --blocking-io --stats --dry-run ' +
-           EXCLUDE + ' ' + source + ' ' + destination)
+           _get_exclude() + ' ' + source + ' ' + destination)
     proc = subprocess.Popen(
         cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
     )
@@ -108,7 +80,7 @@ def backup_with_progress(source, destination):
     pass # start backup ========
     print('Start Backup: this is a non-linear process!')
     tic = time.perf_counter()
-    cmd = 'rsync -avW --blocking-io --progress --delete ' + EXCLUDE + ' ' + source + ' ' + destination
+    cmd = 'rsync -avW --blocking-io --progress --delete ' + _get_exclude() + ' ' + source + ' ' + destination
     proc = subprocess.Popen(
         cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
     )

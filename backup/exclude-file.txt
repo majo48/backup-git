@@ -1,0 +1,7 @@
+/Virtual*
+*.iso
+*.vmem
+*.vmdk
+*.vhd
+*.vhdx
+*.vdi
